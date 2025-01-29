@@ -1,0 +1,83 @@
+---
+title: "Assignment 17: Linear Discriminant Analysis"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the scanned Word document/pdf to Canvas.
+
+------------------------------------------------------------------------
+
+## Question 1. 
+
+In this assignment we will study the data of hospital in the state of Wisconsin where each row of the dataset presents a patient. The variable `Charge` indicates if the patient pays a higher cost (`Charge = 1`) or not (`Charge = 0`). 
+
+[Dataset](HospitalCosts2.csv)
+
+- Train a LDA and QDA model where the target is the variable `Charge` and the predictors are `Age` and `LOS` (the patient's length of stay). Report and plot the accuracy of the LDA and QDA model. 
+
+## Question 2.
+
+Implement LDA and QDA on your own dataset. Report and plot the accuracy of the LDA and QDA model. Make sure that the target variable is binary and your predictors are numeric. 
+
+
+```{r, eval=FALSE, echo=FALSE}
+library(caret)
+df = read_csv('https://bryantstats.github.io/math461/assignments/HospitalCosts.csv')
+
+
+# Calculate median charge
+median_cost = median(df$TOTCHG)
+
+# Create the target column to compare the cost with median charge
+# this target column takes value 0 of the charge is less than the median and 1 otherwise
+
+df$target = ifelse(df$TOTCHG < median_cost, 0, 1)
+# Train
+model = qda(target ~ AGE + LOS, 
+            data = df)
+pred = predict(model, df, 
+        type = 'response')$class
+
+cm <- confusionMatrix(data = pred, reference = factor(df$target))
+cm$overall[1]
+d = data.frame(pred = pred, obs = factor(df$target))
+library(yardstick)
+d %>% conf_mat(pred, obs) %>% autoplot
+```
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+library(caret)
+df = read_csv('https://bryantstats.github.io/math461/assignments/HospitalCosts.csv')
+
+
+# Calculate median charge
+median_cost = median(df$TOTCHG)
+
+# Create the target column to compare the cost with median charge
+# this target column takes value 0 of the charge is less than the median and 1 otherwise
+
+df$target = ifelse(df$TOTCHG < median_cost, 0, 1)
+# Train
+model = lda(target ~ AGE + LOS, 
+            data = df)
+pred = predict(model, df, 
+        type = 'response')$class
+
+cm <- confusionMatrix(data = pred, reference = factor(df$target))
+cm$overall[1]
+d = data.frame(pred = pred, obs = factor(df$target))
+library(yardstick)
+d %>% conf_mat(pred, obs) %>% autoplot
+```
+

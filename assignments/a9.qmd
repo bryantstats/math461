@@ -1,0 +1,33 @@
+---
+title: "Assignment 9: Hierarchical Clustering"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+Given the following data. 
+
+```{r}
+library(knitr)
+library(tidyverse)
+d1 = as_tibble(data.frame(
+     x1 = c(0,    2,  5,   9,  1), 
+     x2 = c(6,    7,  9,   2,  3),
+  Point = c("A","B", "C",  "D",  "E")))
+kable(d1 %>% select(Point, x1, x2))
+```
+
+- Calculate by hand H-Clustering for the data and plot the Dendrogram
+
+- Using the dendrogram above to cluster the dataset into three clusters. Specify the points in each cluster. 

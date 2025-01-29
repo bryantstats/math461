@@ -1,0 +1,41 @@
+---
+title: "Assignment 10: Hierarchical Clustering"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+1.  Reproduce the results of the R codes in [the slides](https://bryantstats.github.io/math461/slides/7_h_clustering_with_R.html#1)
+
+2.  Working with the [Maill Customers](Mall_Customers2.csv) dataset.
+
+-   Apply Hierarchical clustering with the complete linkage. Plot the dendrogram.  
+
+-   Plot the total sum squares within clusters and use the `elbow` method to decide the number of clusters.
+
+-   Replot the dendrogram that with the clusters boxed 
+
+-   Visualize the data using PCA colored by clusters.
+
+3. Redo 2. with another linkage. 
+
+4.  Perform Hierarchical clustering in SAS. Include screenshot of the result here. You can include a screenshot by putting the screenshot in the same folder as your Rmarkdown file and use (assuming screenshot.png is the name of the file):
+
+```{r, echo=TRUE, eval=FALSE}
+![](screenshot.png)
+```
+
+[Video Insruction](https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=69a6573a-2768-4638-92c3-b13a014f110a)
+
+5.  Redo Question 2 on a dataset of your own.

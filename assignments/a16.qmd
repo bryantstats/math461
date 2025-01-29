@@ -1,0 +1,44 @@
+---
+title: "Assignment 16: Linear Discriminant Analysis"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the scanned Word document/pdf to Canvas.
+
+------------------------------------------------------------------------
+
+Given the data
+
+
+```{r, eval=TRUE, echo=FALSE}
+library(knitr)
+library(tidyverse)
+set.seed(2000)
+n = 5
+x1 = rnorm(n, mean = 1, sd = .5)
+df1 = as_tibble(list(x = x1, y = 1))
+
+x2 = rnorm(n, mean = 2, sd = .5)
+df2 = as_tibble(list(x = x2, y = 2))
+
+df = rbind(df1, df2)
+p = df %>% ggplot()+geom_histogram(aes(x = x, fill = as.factor(y)))
+kable(round(df,2))
+```
+
+
+- If $x = 1.4$, what is its associated $y$ value according to LDA? (What class it belongs to?). Give all the details calculation of $p_1 = P(y = 1|x = 1.4)$ and $p_2 = P(y = 2|x = 1.4)$.
+
+- (Extra Credits) Write the equation of the boundary. 
+
+- (Extra Credits) Write the equation of the boundary for QDA Model. 
+

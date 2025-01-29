@@ -1,0 +1,30 @@
+---
+title: "Assignment 12: Principal Component Analysis"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+![](17.png)
+
+*(Image: towardsdatascience)*
+
+1. Given the datset
+
+- Plot the variance of the dataset along two axes.  Which variable contribute more variance to the total variance?
+
+- Apply PCA on the dataset to transform it to a new dataset of principal components.  Plot the variance of the new datasets. How much variance the first principal contribute to the total variance?
+
+
+2. 

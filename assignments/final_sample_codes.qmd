@@ -1,0 +1,314 @@
+---
+title: "Math 461 - Final Project - Sample Codes"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo  = TRUE)
+```
+
+---
+
+*This is a sample codes for part 4 of the Project only. For other parts of the Project, please refer to the assignments for sample codes.*
+
+---
+
+## 1. Binary Target
+
+We will work with the [Titanic Dataset](Titanic.csv). The interested target variable is `Age`. Since this variable is numeric, we will create a binary variable from the `Age` variable and make it our target variable. 
+
+- Logistic Regression
+
+```{r}
+library(tidyverse)
+library(caret)
+df = read_csv('Titanic.csv')
+
+# Select variables for modeling
+df = df %>%  
+  select(Age, Survived, Pclass, Sex) %>% 
+  drop_na()
+
+# Create the binary target variable from Age
+median_age = median(df$Age)
+df$target = ifelse(df$Age > median_age, "0", "1")
+df$Age = NULL  # drop the Age variable from the predictors
+
+
+# convert all categorical variables to factor
+df = df %>% 
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass),
+         Sex = factor(Sex),
+         target = factor(target))
+
+# Train 
+model = glm(target ~ ., 
+            data = df,
+            family = binomial(link = "logit"))
+
+# Make predictions
+predicted_prob = predict(model, df, 
+        type = 'response')
+
+pred = factor(ifelse(predicted_prob>=.5, 1, 0))
+
+# calculate accuracy
+cm <- confusionMatrix(data = pred, reference = factor(df$target))
+cm$overall[1]
+```
+
+
+- Logistic Regression with PCA
+
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+df = read_csv('Titanic.csv')
+
+# Select variables for modeling
+df = df %>%  
+  select(Age, Survived, Pclass, Sex) %>% 
+  drop_na()
+
+# Create the binary target variable from Age
+median_age = median(df$Age)
+df$target = ifelse(df$Age > median_age, "0", "1")
+df$Age = NULL  # drop the Age variable from the data
+
+# Change categorical variables to factor
+df = df %>% 
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass),
+         Sex = factor(Sex),
+         target = factor(target))
+
+# prepare the data for PCA
+df_pca = df %>% select(-target)
+df_pca = dummy_cols(df_pca, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+# PCA
+res.pca <- prcomp(df_pca,  scale = TRUE)
+
+# Create a dataset with only 2 PCs
+df2 = as_tibble(res.pca$x[, c(1:2)])
+df2$target = df$target
+df = df2
+
+
+# Logistic Regression
+model = glm(target ~ ., 
+            data = df,
+            family = binomial(link = "logit"))
+
+predicted_prob = predict(model, df, 
+        type = 'response')
+
+pred = factor(ifelse(predicted_prob>=.5, 1, 0))
+
+cm <- confusionMatrix(data = pred, reference = df$target)
+cm$overall[1]
+```
+
+- LDA
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+df = read_csv('Titanic.csv')
+
+# Select variables for modeling
+df = df %>%  
+  select(Age, Survived, Pclass, Sex) %>% 
+  drop_na()
+
+# Create the binary target variable from Age
+median_age = median(df$Age)
+df$target = ifelse(df$Age > median_age, "0", "1")
+df$Age = NULL  # drop the Age variable from the data
+
+# Change categorical variables to factor
+df = df %>% 
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass),
+         Sex = factor(Sex),
+         target = factor(target))
+
+# Encoding categorical to have a numeric dataset
+
+df_predictors = df %>% dplyr::select(-target)
+df_predictors = dummy_cols(df_predictors, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+df2 = cbind(df %>% dplyr::select(target), df_predictors)
+df = as_tibble(df2)
+
+model = MASS::lda(target ~ .,
+            data = df)
+# make predictions
+pred = predict(model, df, 
+        type = 'response')$class
+# calculate accuracy
+cm <- confusionMatrix(data = pred, reference = factor(df$target))
+cm$overall[1]
+```
+- QDA
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+df = read_csv('Titanic.csv')
+
+# Select variables for modeling
+df = df %>%  
+  dplyr::select(Age, Survived, Pclass, Sex) %>% 
+  drop_na()
+
+# Create the binary target variable from Age
+median_age = median(df$Age)
+df$target = ifelse(df$Age > median_age, "0", "1")
+df$Age = NULL  # drop the Age variable from the data
+
+# Change categorical variables to factor
+df = df %>% 
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass),
+         Sex = factor(Sex),
+         target = factor(target))
+
+# Encoding categorical to have a numeric dataset
+
+df_predictors = df %>% dplyr::select(-target)
+df_predictors = dummy_cols(df_predictors, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+df2 = cbind(df %>% dplyr::select(target), df_predictors)
+df = as_tibble(df2)
+
+model = MASS::qda(target ~ .,
+            data = df)
+# make predictions
+pred = predict(model, df, 
+        type = 'response')$class
+# calculate accuracy
+cm <- confusionMatrix(data = pred, reference = factor(df$target))
+cm$overall[1]
+```
+
+
+## 2. Numeric Target
+
+In this section, our target will be the original `Age` variable, which is already numeric variable. 
+
+- Linear Regression
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+
+df = read_csv('Titanic.csv')
+
+# prepare the data for modeling
+df = df %>%  
+  dplyr::select(Survived, Age, Pclass, Sex) %>% 
+  rename(target = Age) %>%        # rename the target variable  
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass)) %>%  # fix types of variables 
+  drop_na()                            # drop missing values
+
+# Encoding categorical to have a numeric dataset
+
+df_predictors = df %>% dplyr::select(-target)
+
+df_predictors = dummy_cols(df_predictors, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+df2 = cbind(df %>% dplyr::select(target), df_predictors)
+df = as_tibble(df2)
+
+model <- lm(target ~ ., data = df)
+summary(model)
+```
+
+- PCA Regression
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+
+df = read_csv('Titanic.csv')
+
+# prepare the data for modeling
+df = df %>%  
+  dplyr::select(Survived, Age, Pclass, Sex) %>% 
+  rename(target = Age) %>%        # rename the target variable  
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass)) %>%  # fix types of variables 
+  drop_na()                            # drop missing values
+
+# Encoding categorical to have a numeric dataset
+
+df_predictors = df %>% dplyr::select(-target)
+
+df_predictors = dummy_cols(df_predictors, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+df2 = cbind(df %>% dplyr::select(target), df_predictors)
+df = as_tibble(df2)
+
+
+# PCA
+df_pca = df %>% dplyr::select(-target)
+res.pca <- prcomp(df_pca,  scale = TRUE)
+
+# Create a dataset with only 2 PCs
+df2 = as_tibble(res.pca$x[, c(1:2)])
+df2$target = df$target
+df = df2
+
+model = lm(target~., data = df)
+summary(model)
+```
+
+- Possion Regression
+
+```{r}
+library(tidyverse)
+library(caret)
+library(fastDummies)
+
+df = read_csv('Titanic.csv')
+
+# prepare the data for modeling
+df = df %>%  
+  dplyr::select(Survived, Age, Pclass, Sex) %>% 
+  rename(target = Age) %>%        # rename the target variable  
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass)) %>%  # fix types of variables 
+  drop_na()                            # drop missing values
+
+# Encoding categorical to have a numeric dataset
+
+df_predictors = df %>% dplyr::select(-target)
+
+df_predictors = dummy_cols(df_predictors, remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+df2 = cbind(df %>% dplyr::select(target), df_predictors)
+df = as_tibble(df2)
+
+model = glm(target ~. , 
+            data = df,
+            family = poisson(link = "log"))
+
+
+r2 = with(summary(model), 1 - deviance/null.deviance)
+
+print(paste0("R-Squared: ", r2))
+```
+
+---

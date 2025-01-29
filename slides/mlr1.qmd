@@ -1,0 +1,231 @@
+---
+title: "Multiple Linear Regression"
+format: beamer
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Univariate Case: Simple Linear Regression
+
+-   Is there a linear relation between biking and heart disease?
+
+```{r}
+library(tidyverse)
+library(knitr)
+d1 <- read_csv('heart_data.csv')
+d = d1
+kable(head(d1, 10) %>% select(-smoking))
+```
+
+# Simple Linear Regression
+
+-   Regress heart_disease on biking
+
+-   Response/Dependent Variable: heart_disease
+
+-   Predictor variable: biking
+
+# 
+
+```{r}
+l2 <- lm(heart_disease ~ biking, data = d1)
+
+d1 = d1 %>%
+    bind_cols(
+        pred2 = predict(l2, data = d1)
+    ) 
+
+rss2 = sum((d1$heart_disease-d1$pred2)^2)
+
+p1 = d1 %>%
+    ggplot(aes(x = biking)) +
+    geom_point(aes(y = heart_disease), color = "red")
+
+p2 = d1 %>%
+    ggplot(aes(x = biking)) +
+    geom_point(aes(y = heart_disease), color = "red") +
+    geom_abline(intercept = coef(l2)[1], slope = coef(l2)[2],
+                color = "blue", linewidth = 1)
+
+p3 = d1 %>%
+    ggplot(aes(x = biking))+
+    geom_point(aes(y = heart_disease), color = "red") +
+    geom_abline(intercept = coef(l2)[1], slope = coef(l2)[2],
+                color = "blue", linewidth = 1)+
+    geom_text(x = min(d1$biking)+.1, y = max(d1$heart_disease) - .1, label = paste0("R2 = ", round(summary(l2)$r.squared, 2)))
+print(p3)
+```
+
+# 
+
+```{r}
+library(jtools)
+summary(l2)
+```
+
+# Example Data
+
+```{r}
+library(tidyverse)
+library(knitr)
+d1 <- read_csv('heart_data.csv')
+d = d1
+kable(head(d1, 15))
+```
+
+# Univeriate approach: Simple Linear Model
+
+-   Regress heart_disease on biking
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+
+l1 <- lm(heart_disease ~ biking, data = d1)
+
+d1 = d1 %>%
+    bind_cols(
+        pred1 = predict(l1, data = d1)
+    )
+
+rss1 = sum((d1$heart_disease-d1$pred1)^2)
+
+p1 = d1 %>%
+    ggplot(aes(x = biking)) +
+    geom_point(aes(y = heart_disease), color = "red")
+
+p3 = d1 %>%
+    ggplot(aes(x = biking)) +
+    geom_point(aes(y = heart_disease), color = "red") +
+    geom_abline(intercept = coef(l1)[1], slope = coef(l1)[2],
+                color = "blue", linewidth = 1)+
+    geom_text(x = min(d1$biking)+.1, y = max(d1$heart_disease) - .1, label = paste0("R2 = ", round(summary(l1)$r.squared, 2)))
+    
+print(p3)
+```
+
+# 
+
+```{r}
+library(jtools)
+summary(l2)
+```
+
+# Univeriate approach: Simple Linear Model
+
+-   Regress heart_disease on smoking
+
+```{r}
+
+l2 <- lm(heart_disease ~ smoking, data = d1)
+
+d1 = d1 %>%
+    bind_cols(
+        pred2 = predict(l2, data = d1)
+    ) 
+
+rss2 = sum((d1$heart_disease-d1$pred2)^2)
+
+p1 = d1 %>%
+    ggplot(aes(x = smoking)) +
+    geom_point(aes(y = heart_disease), color = "red")
+
+p2 = d1 %>%
+    ggplot(aes(x = smoking)) +
+    geom_point(aes(y = heart_disease), color = "red") +
+    geom_abline(intercept = coef(l2)[1], slope = coef(l2)[2],
+                color = "blue", linewidth = 1)
+
+p3 = d1 %>%
+    ggplot(aes(x = smoking))+
+    geom_point(aes(y = heart_disease), color = "red") +
+    geom_abline(intercept = coef(l2)[1], slope = coef(l2)[2],
+                color = "blue", linewidth = 1)+
+    geom_text(x = min(d1$smoking)+.1, y = max(d1$heart_disease) - .1, label = paste0("R2 = ", round(summary(l2)$r.squared, 2)))
+print(p3)
+```
+
+# 
+
+```{r}
+library(jtools)
+summary(l2)
+```
+
+# 
+
+-   Is there a better way? better model?
+
+# Multivariate Approach: Multiple Regression Model
+
+-   heart_disease = $\beta_0$ + $\beta_1\cdot$ biking + $\beta_2\cdot$ smoking + $\epsilon$
+
+-   $\epsilon \sim N(0, \sigma^2)$
+
+# Graphing the solution
+
+```{r}
+library("plot3D")
+
+x <- d1$smoking
+y <- d1$biking/7
+z <- d1$heart_disease
+
+# Compute the linear regression 
+fit <- lm(z ~ x + y)
+
+d1 = d1 %>%
+    bind_cols(
+        pred3 = predict(fit, data = d1)
+    ) 
+
+rss3 = sum((d1$heart_disease-d1$pred3)^2)
+
+# create a grid from the x and y values (min to max) and predict values for every point
+# this will become the regression plane
+grid.lines = 40
+x.pred <- seq(min(x), max(x), length.out = grid.lines)
+y.pred <- seq(min(y), max(y), length.out = grid.lines)
+xy <- expand.grid( x = x.pred, y = y.pred)
+z.pred <- matrix(predict(fit, newdata = xy), 
+                 nrow = grid.lines, ncol = grid.lines)
+
+# create the fitted points for droplines to the surface
+fitpoints <- predict(fit)
+
+# scatter plot with regression plane
+scatter3D(x, y, z, pch = 19, cex = 1,colvar = NULL, col="red", 
+          theta = 20, phi = 10, bty="b",
+          xlab = "smoking", ylab = "biking", zlab = "heart_disease",  
+          surf = list(x = x.pred, y = y.pred, z = z.pred,  
+                      facets = TRUE, fit = fitpoints, col=ramp.col (col = c("dodgerblue3","seagreen2"), n = 300, alpha=0.9), border="black"), main = paste0("RSS: ",round(rss3,2), ", R2 = ", round(summary(fit)$r.squared, 2)))
+```
+
+-   heart_disease = 14.98 + -0.2 $\cdot$ biking + 0.18 $\cdot$ smoking
+
+# 
+
+```{r}
+library(jtools)
+summary(fit)
+```
+
+# Model Definition
+
+$$
+y = \beta_0 + \beta_1x_1 + + \beta_2x_2 +...+ \beta_px_p + \epsilon
+$$
+
+-   Model Assumptions
+
+    -   (A1) The response variable $y$ is a random variable and the predictor $x_1, x_2, ..., x_n$ is non-random
+
+    -   (A2) $\epsilon \sim N(0, \sigma^2)$
+
+# Assignment 1: Linear Models in R
+
+[Assignment 1](../assignments/a1.html)

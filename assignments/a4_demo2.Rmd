@@ -1,0 +1,63 @@
+---
+title: "Assignment 4 - Logistic Regression"
+author: "Son Nguyen"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 4
+
+### Part a
+
+```{r}
+d = read.csv('https://bryantstats.github.io/math461/assignments/HospitalCosts.csv')
+
+# Calculate median charge
+median_cost = median(d$TOTCHG)
+
+# Create a column to compare the cost with median charge
+# this column takes value 0 of the charge is less than the median and 1 otherwise
+
+d$charge = ifelse(d$TOTCHG < median_cost, 0, 1)
+
+
+# Train
+model = glm(charge ~ AGE + LOS, 
+            data = d,
+            family = binomial(link = "logit"))
+# Report model summary
+summary(model)
+
+predicted_prob = predict(model, list(AGE = 20, LOS = 1), 
+        type = 'response')
+predicted_prob
+
+
+predicted_class = ifelse(predicted_prob>=.5, 1, 0)
+predicted_class
+
+d$predicted_prob_charge = predict(model, d, type = "response")
+
+d$predicted_charge = ifelse(d$predicted_prob_charge <.5, 0, 1)
+
+mean(d$predicted_charge == d$charge)
+
+```
+
+### Part b
+
+```{r}
+
+```
+
+### Part c
+
+```{r}
+mean(d$predicted_charge == d$charge)
+```
+
+

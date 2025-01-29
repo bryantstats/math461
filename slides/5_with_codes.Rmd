@@ -1,0 +1,217 @@
+
+---
+title: "K-means Clustering in R"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+```
+
+# K-mean Clustering
+
+---
+# Step 1: Scale the data
+
+
+```{r, echo = TRUE}
+library(tidyverse)  # data manipulation
+library(factoextra) # clustering algorithms & visualization
+df <- USArrests
+df <- na.omit(df)
+df <- data.frame((scale(df)))
+```
+
+---
+# Step 2: Plot the WSS 
+
+```{r}
+set.seed(123)
+fviz_nbclust(df, kmeans, method = "wss")
+```
+
+- Decide the number of cluster by `elbow` method, $k = 4$
+
+---
+# Step 3: Perform K-means
+
+
+```{r, echo = TRUE}
+k <- kmeans(df, centers = 4)
+df1 = df
+df1$cluster = factor(k$cluster)
+head(df1)
+```
+
+---
+# Step 4: Visualizing
+
+```{r, echo = TRUE}
+df1 = as_tibble(df1, rownames = NA) %>% 
+    rownames_to_column()
+
+df1 %>% ggplot(aes(x = Murder, y = UrbanPop, color = cluster))+geom_point()+
+  ggrepel::geom_text_repel(aes(label = rowname))
+```
+
+---
+# Step 4: Visualizing
+
+```{r, echo = TRUE}
+df1 %>% ggplot(aes(x = Murder, y = Assault, color = cluster))+geom_point()+
+  ggrepel::geom_text_repel(aes(label = rowname))
+```
+
+
+---
+# Step 4: Visualizing
+
+```{r, echo = TRUE}
+df1 %>% ggplot(aes(x = Murder, y = Rape, color = cluster))+geom_point()+
+  ggrepel::geom_text_repel(aes(label = rowname))
+```
+
+---
+# Step 5: Visualizing with PCA
+
+```{r}
+fviz_cluster(k, data = df)
+```
+
+---
+# Cluster Summary
+
+```{r}
+k$centers
+```
+
+---
+# Example 2
+
+[Link to Dataset](autos.csv)
+
+```{r}
+df = read.csv('autos.csv')
+
+# Select numeric variables for clustering
+df = df[, c("num_of_doors", "wheel_base", "length", "width", "height")]
+
+# remove missing values
+df <- na.omit(df)
+
+# Scale the data
+df <- data.frame((scale(df)))
+```
+
+
+---
+# Example 2
+
+```{r}
+# plotting WSS
+fviz_nbclust(df, kmeans, method = "wss")
+```
+
+

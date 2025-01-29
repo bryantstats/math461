@@ -1,0 +1,36 @@
+---
+title: "Assignment 7: K-means Clustering"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+Given the following dataset
+
+```{r}
+library(tidyverse)
+x = c(1,2,3,4,5)
+set.seed(1983)
+y = sample(1:10, replace = TRUE, 5)
+  
+df <- data.frame(Cluster = c(1,2,1,1,2),
+                 Point = LETTERS[1:5],
+                 x = x,
+                 y = y)
+df = as_tibble(df)
+
+library(knitr)
+kable(df %>% select(-Cluster))
+```
+1. Consider all the points are in one cluster.  Find the centroid of the data. Calculate the total variance within of the cluster. 
+
+2. Let assign A and B for cluster 1 and the remainders for cluster 2. Find the two centroids of the two clusters and calculate the total variance within of the cluster. 
+
+3. Calculate the distance of all the points to the two centroids. Reassign the points to the appropriate cluster.

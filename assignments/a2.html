@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Assignment 2: Multiple Linear Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="a2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="a2_files/libs/quarto-html/quarto.js"></script>
+<script src="a2_files/libs/quarto-html/popper.min.js"></script>
+<script src="a2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="a2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="a2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="a2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="a2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="a2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="a2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#question-1." id="toc-question-1." class="nav-link active" data-scroll-target="#question-1.">Question 1.</a></li>
+  <li><a href="#question-2.-generalized-f-test" id="toc-question-2.-generalized-f-test" class="nav-link" data-scroll-target="#question-2.-generalized-f-test">Question 2. Generalized F-test</a></li>
+  <li><a href="#question-3.-generalized-f-test" id="toc-question-3.-generalized-f-test" class="nav-link" data-scroll-target="#question-3.-generalized-f-test">Question 3. Generalized F-test</a></li>
+  <li><a href="#question-4.-generalized-f-test" id="toc-question-4.-generalized-f-test" class="nav-link" data-scroll-target="#question-4.-generalized-f-test">Question 4. Generalized F-test</a></li>
+  <li><a href="#question-5.-generalized-f-test-in-r" id="toc-question-5.-generalized-f-test-in-r" class="nav-link" data-scroll-target="#question-5.-generalized-f-test-in-r">Question 5. Generalized F-test in R</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Assignment 2: Multiple Linear Models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<hr>
+<p><strong>Submission</strong>: Screenshot your written answers for Question 1 to 4. For Question 5, answer the questions and include the screenshots to support your answers.</p>
+<hr>
+<section id="question-1." class="level3">
+<h3 class="anchored" data-anchor-id="question-1.">Question 1.</h3>
+<p>Suppose we want to assess the relation between systolic blood pressure and the following predictors/independent variables</p>
+<ul>
+<li>BMI,</li>
+<li>age (a continuous variable, measured in years),</li>
+<li>male gender (yes/no), and</li>
+<li>treatment for hypertension (yes/no).</li>
+</ul>
+<p>For analytic purposes, treatment for hypertension is coded as 1=yes and 0=no. Gender is coded as 1=male and 0=otherwise.</p>
+<p>A multiple regression analysis reveals the following:</p>
+<p><img src="1.png" class="img-fluid"></p>
+<ol type="a">
+<li><p>Write the equation of the regression model</p></li>
+<li><p>Which variable is the most significant variable according to the t-test? Which variable is the least significant variable?</p></li>
+<li><p>Estimate the blood pressure of a 50 year old male, with a BMI of 25 who is not on treatment for hypertension.</p></li>
+</ol>
+<hr>
+</section>
+<section id="question-2.-generalized-f-test" class="level3">
+<h3 class="anchored" data-anchor-id="question-2.-generalized-f-test">Question 2. Generalized F-test</h3>
+<p>The following two models were fit to 18 observations:</p>
+<p>Model 1: <span class="math inline">\(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \epsilon\)</span><br>
+Model 2: <span class="math inline">\(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1x_2 +\beta_4 x_1^2 +\beta_5 x_2^2 + \epsilon\)</span></p>
+<p>The result of the regression are:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model Number</th>
+<th style="text-align: left;">Error Sum of Squares</th>
+<th style="text-align: left;">Regression Sum of Squares</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">102</td>
+<td style="text-align: left;">23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">78</td>
+<td style="text-align: left;">47</td>
+</tr>
+</tbody>
+</table>
+<p>Calculate the value of the F-statistics used to test the hypothesis that <span class="math inline">\(\beta_3 = \beta_4 =\beta_5 = 0\)</span></p>
+<hr>
+</section>
+<section id="question-3.-generalized-f-test" class="level3">
+<h3 class="anchored" data-anchor-id="question-3.-generalized-f-test">Question 3. Generalized F-test</h3>
+<p>You are determining the relationship of salary (<span class="math inline">\(y\)</span>) to experience (<span class="math inline">\(x_1\)</span>) for both men (<span class="math inline">\(x_2 = 1\)</span>) and woman (<span class="math inline">\(x_2=0\)</span>). You fit the model</p>
+<p><span class="math display">\[y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1x_2 + \epsilon\]</span></p>
+<p>Given that the number of observations is 100. You are given the following regression results.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Sources</th>
+<th style="text-align: left;">Sum of Squares</th>
+<th style="text-align: left;">Degree of Freedom</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Regression</td>
+<td style="text-align: left;">330.0117</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Error</td>
+<td style="text-align: left;">12.8156</td>
+<td style="text-align: left;">7</td>
+</tr>
+</tbody>
+</table>
+<p>You also fit the below model to the same observations.</p>
+<p><span class="math display">\[y = \gamma_0 + \gamma_1 x_1 +  \epsilon\]</span> You are given</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Sources</th>
+<th style="text-align: left;">Sum of Squares</th>
+<th style="text-align: left;">Degree of Freedom</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Regression</td>
+<td style="text-align: left;">315.0992</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Error</td>
+<td style="text-align: left;">27.7281</td>
+<td style="text-align: left;">9</td>
+</tr>
+</tbody>
+</table>
+<p>Determine the F-ratio to test whether the linear relationship between salary and experience is identical for men and women.</p>
+<hr>
+</section>
+<section id="question-4.-generalized-f-test" class="level3">
+<h3 class="anchored" data-anchor-id="question-4.-generalized-f-test">Question 4. Generalized F-test</h3>
+<p>A professor ran an experiment in three sections of a psychology courses to show that the more digits in a number, the more difficult it is to remember. The following variables were used in a multiple regression:</p>
+<p><span class="math inline">\(x_1=\)</span> number of digits in the number</p>
+<p><span class="math inline">\(x_2 = 1\)</span> if student was in section 1, 0 otherwise</p>
+<p><span class="math inline">\(x_3 = 1\)</span> if student was in section 2, 0 otherwise</p>
+<p><span class="math inline">\(y=\)</span> percentage of students correctly remembering the number</p>
+<p>You are given</p>
+<ul>
+<li>A total of 42 students participated in the study</li>
+<li>The regression equation <span class="math display">\[y = \beta_0 + \beta_1 x_1 + \beta_2 x_1^2 + \beta_3 x_2 +\beta_4 x_3 + \epsilon\]</span> was to fit the data and resulted in <span class="math inline">\(R^2 = 0.940\)</span></li>
+<li>A second regression equation <span class="math inline">\(y = \gamma_0 + \gamma_1 x_1 + \gamma_2 x_1^2+\epsilon\)</span> was to fit to the data and resulted <span class="math inline">\(R^2 = 0.915\)</span></li>
+</ul>
+<p>Determine the F statistic used to test whether class section is significant variable.</p>
+<hr>
+</section>
+<section id="question-5.-generalized-f-test-in-r" class="level3">
+<h3 class="anchored" data-anchor-id="question-5.-generalized-f-test-in-r">Question 5. Generalized F-test in R</h3>
+<p>In this question, we will examine the hospital cost of patients in Wisconsin in 2003 using patients’ information such as their age, gender, and their length of stay at the hospital. The data and the variables description can be downloaded at the below links.</p>
+<ul>
+<li><p><a href="HospitalCosts.csv">Hospital Costs</a></p></li>
+<li><p><a href="HospitalCosts_description.png">Variable Description</a></p></li>
+</ul>
+<ol type="a">
+<li>Let regress the total charge (<code>TOTCHG</code>) on age and length of stay.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math461/assignments/HospitalCosts.csv'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">lm</span>(TOTCHG<span class="sc">~</span>AGE <span class="sc">+</span> LOS, <span class="at">data =</span> d)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="a">
+<li>We now can use the model to predict the total charge of a 13-year-old that stays a week at a hospital.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(model, <span class="fu">list</span>(<span class="at">AGE =</span> <span class="dv">13</span>, <span class="at">LOS =</span> <span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Predict the the total charge of a 21-year-old that stays two weeks at a hospital.</li>
+</ul>
+<ol start="3" type="a">
+<li>Let consider the two following models and run the F-test to test the significant of the full model.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(TOTCHG<span class="sc">~</span> LOS <span class="sc">+</span> <span class="fu">factor</span>(GENDER) <span class="sc">+</span> <span class="fu">factor</span>(RACE) <span class="sc">+</span> AGE <span class="sc">+</span> APRDRG, <span class="at">data =</span> d)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>reduced_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(TOTCHG<span class="sc">~</span> LOS <span class="sc">+</span> <span class="fu">factor</span>(GENDER) <span class="sc">+</span> <span class="fu">factor</span>(RACE) , <span class="at">data =</span> d)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_model, full_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Is the full model statistically significant comparing with the reduced model?</li>
+</ul>
+<ol start="4" type="a">
+<li>Consider another reduced model where <code>TOTCHG</code> is regressed on length of stay, gender, race and age. Is the full model statistically significant comparing with the reduced model? Report the p-value of the test.</li>
+</ol>
+<hr>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

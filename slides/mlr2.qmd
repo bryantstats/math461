@@ -1,0 +1,76 @@
+---
+title: "Multiple Linear Regression"
+format: beamer
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Interpreting MLR Results
+
+We want to study the effects of effects of calorie consumption (in 1000s), age, and level of activity (0, 1 and 2 the higher number indicating being more active) on the BMI. The results from R are as follows. 
+
+# 
+
+![](m1.png)
+
+#
+
+Interpret the results and calculate the predicted BMI a 50 year old who consumes 3000 calories per day (cal=3) and the level of activity 1. 
+
+
+# Generalized F-test
+
+-   Full Model: $$
+    y = \beta_0 + \beta_1x_1 + \beta_2x_2 +...+ \beta_px_p + \epsilon
+    $$
+
+-   Reduced Model: $$
+    y = \beta_0 + \beta_1x_1 + + \beta_2x_2 +...+ \beta_{p-q}x_{p-q} + \epsilon
+    $$
+
+# 
+
+![](12.png)
+
+# 
+
+| Model   | $RSS$   | $RegSS$   |       |
+|---------|---------|-----------|-------|
+| Reduced | $RSS_0$ | $RegSS_0$ | $TSS$ |
+| Full    | $RSS_1$ | $RegSS_1$ | $TSS$ |
+
+# 
+
+-   $H_0: \beta_{p-q+1} = \beta_{p-q+2} =...= \beta_{p-q} = 0$ or Reduced model is adequate
+
+-   Test Statistics
+
+![](13.png)
+
+# F and R2
+
+$$
+    F = \frac{n-p-1}{q}\cdot \frac{R^2_1-R^2_0}{1 - R^2_1}
+    $$
+
+# Example
+
+![](15.png)
+
+# 
+
+# Example
+
+You wish to find a model to predict insurance sales, using 27 observations and 8 variables $x_1$, $x_2$,...,$x_8$. The analysis of variance (ANOVA) tables are below. Model A contains all 8 variables and Model B contains $x_1$ and $x_2$ only.
+
+Calculate the F-statistics for testing $H_0: \beta_3 = \beta_4 = \beta_5 = \beta_6 = \beta_7 = \beta_8 = 0$
+
+# 
+
+![](16.png)
+
+# 
+

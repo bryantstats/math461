@@ -1,0 +1,130 @@
+---
+title: "Assignment 12: Principal Component Analysis"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = TRUE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+![](17.png)
+
+*(Image: towardsdatascience)*
+
+## Sample Codes
+
+Principal components analysis transforms the original data to a new data containing the  principal components (PCs). 
+
+### Example 1
+
+Suppose we have the following dataset (called `dataset1`)
+
+
+```{r}
+library(ggplot2)
+library(tidyverse) 
+
+x = c(1, 2, 3, 4, 5)
+y = c(1,2,2.5,3, 4.7)
+d <- data.frame(x = x, y=y)
+d
+```
+
+
+The variance along x-axis and y-axis are
+
+```{r}
+var(x)
+var(y)
+```
+
+Let's apply PCA to this data to transform the data to the data conatining the Principal Components. Let call this dataset `dataset2`.
+
+```{r}
+d2 = prcomp(d)$x
+d2
+```
+Now let's calculate the variance of the two PCs
+
+```{r}
+# variance of the first principal
+var(d2[,1])
+# variance of the second principal
+var(d2[,2])
+```
+We observe that most of the variance of the dataset are in the first pricipal component. At this point, we could choose to transform the `dataset1` to `dataset2` without loosing any of the variance or we can just transform `dataset1` to the first column of `dataset2` without loosing much of the total variance. 
+
+### Example 2. 
+
+
+In this section, we will work with the `USArrests` dataset. We will apply the PCA to the data as follows.
+
+```{r}
+library(factoextra)
+library(tidyverse)  
+library(gridExtra)
+data("USArrests")
+
+df = USArrests
+# The variable Species (index = 5) is removed
+# before the PCA analysis
+res.pca <- prcomp(df,  scale = TRUE)
+
+# Default plot
+fviz_eig(res.pca, addlabels = TRUE)
+get_eig(res.pca)
+```
+
+We can see that the first two PCs captures about 86% variance of the original data. If we want to reduce the dimension of the original data from 4 to 2, we can just use this two PCs instead of the entire original data.  To put it in perspective, each variable in the original data set (after scaling) captures the same amount of the total variance, so each captures 25% the total variance. 
+
+We can see the contribution of the original variables in the first two PCs. 
+
+```{r}
+# Contributions of variables to PC1
+fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+# Contributions of variables to PC2
+fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+
+```
+
+```{r}
+library(ggfortify)
+autoplot(res.pca)
+```
+
+
+
+## Questions
+
+1.  Run the all the above codes show all the results
+
+2. Create a dataset of your own and redo Example 1 on the dataset. Can you use PCA to reduce the dimension of your dataset without loosing much of the total variance?
+
+3.  Run the PCA for the `YieldCurve` data in the library `YieldCurve`.  Install the package using `install.packages("YieldCurve")` and use the following to import the data. 
+
+```{r, eval=FALSE}
+library(YieldCurve)
+data(FedYieldCurve)
+df = FedYieldCurve
+```
+
+Do the follows. 
+
+- Plot the scree plot of the percentage of the total variances captured in the PCs. 
+
+- How much variance is captured by the first two PCs? by the first PC?
+
+- What are the contribution of the original variables in the first PC?
+
+4. Redo 3 on a dataset of your own. 
+
+

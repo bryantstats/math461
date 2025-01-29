@@ -1,0 +1,39 @@
+---
+title: "Assignment 8: K-means Clustering"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+1.  Reproduce the results of the R codes in [the slides](https://bryantstats.github.io/math461/slides/5_with_codes.html#1)
+
+2.  Working with the [Maill Customers](Mall_Customers2.csv) dataset.
+
+-   Plot the total sum squares within clusters and use the `elbow` method to decide the number of clusters.
+
+-   Visualize the data with the selected number of clusters. Give your comments on the clustering results.
+
+-   Visualize the data using PCA colored by clusters.
+
+-   Report the cluster means
+
+3.  Perform k-means clustering in SAS. Explain why the cluster means may be different. Include screenshot of the result here. You can include a screenshot by putting the screenshot in the same folder as your Rmarkdown file and use (assuming screenshot.png is the name of the file):
+
+```{r, echo=TRUE, eval=FALSE}
+![](screenshot.png)
+```
+
+[Video Insruction](https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d7af86e8-db51-4bce-a07d-b12a015eb165)
+
+4.  Redo Question 2 on a dataset of your own.

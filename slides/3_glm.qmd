@@ -1,0 +1,183 @@
+---
+title: "Generalized Linear Models"
+format: beamer
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Example 1
+
+-   We would like to predict $admit$ given $gre$ and $gpa$
+
+```{r}
+library(tidyverse)
+#library(kableExtra)
+library(jtools)
+library(haven)
+library(knitr)
+mydata = read_dta('binary.dta')
+mydata = mydata %>% select(-rank)
+mydata = head(mydata, 10)
+kable(mydata)
+```
+
+```{r, eval=FALSE}
+mylogit <- glm(admit ~ gre + gpa, data = mydata, family = "binomial")
+mylogit
+# 
+```
+
+# 
+
+-   Can we use linear model here?
+
+$$
+admit = \beta_0 + \beta_1\cdot gre + \beta_2 \cdot gpa
+$$
+
+# 
+
+-   Multiple Linear Regression cannot handle binary/categorical response
+
+# 
+
+-   Linear Model
+
+$$
+admit = \beta_0 + \beta_1\cdot gre + \beta_2 \cdot gpa
+$$
+
+-   Logistic Regression
+
+$$
+P(admit =1) = \frac{1}{1+exp\big(-\beta_0 - \beta_1\cdot gre - \beta_2 \cdot gpa \big)}
+$$
+
+# 
+
+-   When fit the logistic regression on the data we obtain:
+
+$$
+P(admit =1) = \frac{1}{1+exp\big(-0.73 - 0.02     \cdot gre +3.57  \cdot gpa \big)}
+$$
+
+# 
+
+-   For example, with a student having 380 GRE and 3.61 gpa, the model will predict
+
+$$
+P(admit = 1) = \frac{1}{1+exp\big(-0.73 - 0.02     \cdot 600 +3.57  \cdot 4.0 \big)} = 0.01
+$$
+
+-   This means that the chance of the student being admitted is 0.01 or the student will not be admitted by the model prediction.
+
+# Logistic Regression
+
+-   Suppose the response $y$ can only takes two values 0 and 1. The logistic regression models the probability of $y=1$ as follows. $$
+    \pi = P(y=1) = \frac{1}{1+ exp\big(-\beta_0-\beta_1x_1-\beta_2x_2\big)}
+    $$
+
+or, equivalently $$
+\ln\bigg(\frac{\pi}{1-\pi}\bigg) = \beta_0 + \beta_1x_1 + \beta_2x_2
+$$
+
+# Generalized Linear Model
+
+-   The GLM models $\mu = E(y)$ as follows. $$
+    g(\mu) = \beta_0 + \beta_1x_1+...+\beta_px_p = x'\beta 
+    $$ where $y$ is assumed to follow an exponential distribution family.
+
+-   Exponential distribution family includes all the basic distribution such as normal distribution, binomial distribution, Poisson distribution...
+
+-   $g(\mu)$ is called the canonical link function
+
+-   For logistic regression, the link function is a logit function $$g(x) = \ln\bigg(\frac{x}{1-x}\bigg)$$
+
+# Some GLMs
+
+$$
+    g(\mu) = \beta_0 + \beta_1x_1+...+\beta_px_p = x'\beta 
+    $$
+
+![](18.png)
+
+# Example 2
+
+A statistician uses logistic regression to model a probability of success of a random variable. The estimated parameters for the intercepts and two predictors are $\hat{\beta}_0 = 0.02$, $\hat{\beta}_1 = -0.4$, and $\hat{\beta}_2 = 0.3$. Calculate the predicted probability of success at $x_1 = 1$ and $x_2 = 1$.
+
+# 
+
+# Example 3
+
+A statistician uses logistic regression to model a probability of success of a random variable. You are given
+
+-   There is one predictors and an intercept in the model
+
+-   The estimates of success at $x = 4$ and $x = 6$ are 0.8 and 0.9, respectively.
+
+Calculate $\hat{\beta}_1$ the estimated slope of the model.
+
+```{r, eval=FALSE}
+-0.4359
+```
+
+# 
+
+# Example 4
+
+You are given the following for a fitted GLM. Calculate the modeled probability of an Urban driver having an accident.
+
+![](20.png)
+
+# 
+
+# Odd of an event
+
+-   The odds of an event A is the ratio of the probability that A occurs to the probability that A does not occur.
+
+-   The odd of tossing an coin and see Tail is 1:1
+
+-   The odd of rolling a die and see number 6 is $\frac{1/6}{5/6}$ = 1:5
+
+# 
+
+-   Logistic regression in terms of Odd
+
+$$
+\ln(\text{Odd of Success}) = \ln\bigg(\frac{\pi}{1-\pi}\bigg) = \beta_0 + \beta_1x_1 + \beta_2x_2
+$$
+
+# Possion Regression and Other link functions
+
+-   Poisson Regression are used when the response are count variables, for example: the number of claims of a customer...
+
+-   The response is assume to follow a Poisson distribution and the link function used is a log link function, $ln$. $$
+    \ln(\mu) = \beta_0 + \beta_1x_1 + \beta_2x_2 + ... + \beta_nx_n
+    $$
+
+# Example 5
+
+You are given the following when fitted a GLM model. Calculate the predicted $Y$ value for a female with age of 22.
+
+![](21.png){width="70%"}
+
+# 
+
+# Example 6
+
+You are given the following GLM output. Calculate the predicted premium for an insured in Risk Group 2 with Vehicle Symbol 2.
+
+![](25.png){width="50%"}
+
+# 
+
+# Example 7
+
+You are given the following output of an GLM. Calculate the probability of a policy with 5 years of tenure that experienced at a 10% prior rate increase and has 100,000 in amount of insurance will retain into the next policy term.
+
+![](27.png){width="50%"}
+
+# 

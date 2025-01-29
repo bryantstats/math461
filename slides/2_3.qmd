@@ -1,0 +1,144 @@
+---
+title: "Multiple Regression - Colinearity"
+format: beamer
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# 
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(corrplot)
+library(car)
+library(jtools)
+library(faraway)
+library(kableExtra)
+
+hip_model = lm(hipcenter ~ ., data = seatpos)
+
+seatpos %>%
+  kbl() %>% 
+      kable_styling(bootstrap_options = "striped", font_size = 8)
+```
+
+# 
+
+```{r}
+hip_model = lm(hipcenter ~ ., data = seatpos)
+summ(hip_model,  model.info = getOption("summ-model.info", FALSE))
+```
+
+# 
+
+-   F-test tells us that the model significant
+
+-   p-value for individual predictors tells us that they are not significant
+
+-   Ht and HtShoes has opposite effect on the seat position
+
+-   All of these seems counter-intuitive
+
+-   We are dealing with multilinearity
+
+# Multilinearity
+
+-   Multilinearity is when some of the predictors supply similar information to the response
+
+# Mutilinearity Diagnosis
+
+```{r}
+corrplot(cor(seatpos[, -c(9)]), method = "number", type = "upper", diag = FALSE)
+```
+
+# Some Observations
+
+-   Ht and HtShoes are 100% correlated. Thus we just need one of these variable to be in the model
+
+-   Ht and HtShoes are also very highly correlated to other predictors.
+
+# 
+
+-   Let's build a linear model among the predictors where HtShoes is the response.
+
+```{r}
+hip_model = lm(HtShoes ~ ., data = seatpos[,-c(9)])
+summ(hip_model,  model.info = getOption("summ-model.info", FALSE), digits = 5)
+```
+
+# 
+
+-   $R^2 = 0.99675$ means that 99.675% of variance of HtShoes are contained in the remaining predictors.
+
+-   This means, there is only $1-R^2 =$ 0.325% of variance of HtShoes is unique to HtShoes.
+
+-   Why we even need HtShoes in the model if it does not contribute much?
+
+# 
+
+-   $1-R^2$ is called the tolerance of the variance.
+
+-   The variance of Inflation Factor $VIF = \frac{1}{1-R^2}$
+
+-   We want predictors have higher tolerance (more than .1) and lower VIF (smaller than 10)
+
+# 
+
+```{r}
+summ(hip_model, model.info = getOption("summ-model.info", FALSE), vifs = TRUE)
+```
+
+# Another Example
+
+```{r}
+library(tidyverse)
+library(knitr)
+d1 <- read_csv('heart_data.csv')
+
+d1 %>%
+  kbl() %>% 
+      kable_styling(bootstrap_options = "striped")
+
+```
+
+# 
+
+```{r}
+
+set.seed(2023)
+e3 = rnorm(nrow(d1), mean=1, sd=1)
+d1 = d1 %>%
+    mutate(
+        x3 = 3*biking - 10*smoking + e3)
+fit = lm(heart_disease~biking+smoking, data = d1)
+summ(fit, vifs = TRUE)
+```
+
+# Creating multicolinearity
+
+-   We want to purposely create a new variable that colinear with the two original variables.
+
+-   $x3 = 3*biking - 10*smoking + \epsilon$, $\epsilon \sim N(0,1)$
+
+# Creating multicolinearity
+
+```{r}
+fit = lm(heart_disease~biking+smoking+x3, data = d1)
+summ(fit, vifs = TRUE)
+```
+
+# What to do?
+
+-   If the main goal of building the model is for prediction, then we do not need to do anything. Multuiconolinearity does not affect the predictive power of the model.
+
+-   Check if there is any duplicate predictor
+
+-   Remove redundant variable
+
+-   Use variable selections methods such as stepwise or LASSO
+
+-   Use methods to create new set of variables from the original variables, such as principal component analysis.

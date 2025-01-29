@@ -1,0 +1,32 @@
+---
+title: "Assignment 4"
+output: word_document
+date: "2024-02-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Questions
+
+```{r}
+d = read.csv('https://bryantstats.github.io/math461/assignments/HospitalCosts.csv')
+
+# Calculate median charge
+median_cost = median(d$TOTCHG)
+
+# Create a column to compare the cost with median charge
+# this column takes value 0 of the charge is less than the median and 1 otherwise
+
+
+d$charge = ifelse(d$TOTCHG < median_cost, 0, 1)
+
+# Train
+model = glm(charge ~ AGE + LOS, 
+            data = d,
+            family = binomial(link = "logit"))
+# Report model summary
+summary(model)
+
+```

@@ -1,0 +1,65 @@
+---
+title: "test"
+output: html_document
+date: "2024-03-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(tidyverse)
+library(factoextra)
+library(dplyr)
+library(GGally)
+library(inspectdf)
+library(ggiraphExtra)
+library(factoextra)
+library(tidyr)
+df_original = read_csv("SpotifyFeatures.csv")
+
+
+# Select only numeric variables
+df = df_original %>%
+  select(where(is.numeric))
+# scale the data
+df <- data.frame((scale(df)))
+# plot the correlation matrix
+ggcorr(df, label=T, label_size = 2.9, hjust = 1)
+
+# Define the range of clusters you want to consider
+num_clusters <- 2:7
+# Calculate WSS for each number of clusters
+wss <- numeric(length(num_clusters))
+for (i in seq_along(num_clusters)) {
+  k <- num_clusters[i]
+  kmeans_model <- kmeans(df, centers = k, nstart = 10)
+  wss[i] <- kmeans_model$tot.withinss
+}
+# Plot the WSS values against the number of clusters
+plot(num_clusters, wss, type = "b", pch = 19, frame = FALSE,
+     xlab = "Number of Clusters", ylab = "Within-Cluster Sum of Squares")
+# Add a vertical line at the "elbow point"
+elbow_point <- which(diff(wss) <= 0.01 * max(diff(wss)))
+abline(v = num_clusters[elbow_point], col = "red")
+
+# Apply k-means
+k <- kmeans(df, centers = 3)
+df1 = df
+df1$cluster = factor(k$cluster)
+
+# plot the radar
+library(ggiraphExtra)
+ggRadar(
+  data=df1,
+  mapping = aes(colours = cluster),
+  interactive = T
+)
+
+
+
+```
+

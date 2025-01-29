@@ -1,0 +1,55 @@
+---
+title: "Assignment 14: PCA in SAS"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit a video addressing the following questions.
+
+[Sample Video](https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=bcd42de1-6331-4ac1-8def-b14f0158a057)
+
+------------------------------------------------------------------------
+
+![](17.png)
+
+*(Image: towardsdatascience)*
+
+------------------------------------------------------------------------
+
+This assignment will work with below NBA dataset.  This NBA dataset contains statistics for NBA games. The dataset is obtained from Kaggle. 
+
+[Dataset](games_details2.csv)
+
+## 1. PCA
+
+- Apply PCA on the entire dataset (all variables). 
+
+- How much variance are explained in the first two principal components?  
+
+- How many principal components is enough to capture 50% the variance of the dataset?
+
+## 2. PCR
+
+Suppose we want to build a model to predict the points of a game (`PTS`) variable using Principal Component Regression.  Do the follows to compare the PCR and the regular regression model.
+
+#### Regular regression Regression 
+
+- Run a regression model on the dataset with the response `PTS` and the predictors being the remaining variables. Report the R-squared of the model. 
+
+#### Principal Component Regression
+
+- Apply the PCA on the predictors (all variables except the `PTS` variable)
+
+- Run a regression with the response `PTS` and the predictors being the first five principal components. 
+
+- Report the R-squared of the model. 
+
+------------------------------------------------------------------------

@@ -1,0 +1,100 @@
+---
+title: "Assignment 14: Analysis of Variance"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = TRUE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+
+*(Image: towardsdatascience)*
+
+### Example
+
+In this example we will study the NBA dataset containign statistics for NBA games.  The dataset is obtained from [Kaggle](https://www.kaggle.com/datasets/nathanlauga/nba-games)
+
+#### Linear Regression 
+
+We first run the linear model on the original dataset with the response being `PTS` and the predictors are the remaining variables.
+
+```{r, eval=FALSE, echo=FALSE}
+library(tidyverse)
+library(factoextra)
+df = read_csv('games_details.csv')
+df = df %>% select(-GAME_ID, -TEAM_ID, -TEAM_ABBREVIATION, -TEAM_CITY, -PLAYER_ID, -PLAYER_NAME, -NICKNAME, -COMMENT, -MIN, -START_POSITION)
+df = df %>% select(-FGM, -FG3M, -FTM, - FGA, -FG_PCT, -FG3A, -FG3_PCT)
+df = na.omit(df)
+```
+
+
+
+```{r}
+library(tidyverse)
+library(factoextra)
+df = read_csv('games_details2.csv')
+
+model = lm(PTS~., data = df)
+summary(model)
+```
+
+#### Principal Component Regression (PCR)
+
+PCR is a linear regression where the predictors are not the original variables of the dataset but the principal components of the original variables. PCR provides two benefits:  
+
+- (1) it reduces the number of predictors without loosing much model performance.  This leads to a more simple model for interpretation. 
+
+- (2) it overcome the issues of colinearlity that may occour in the regular linear model. 
+
+- To run PCR, we first run PCA on the dataset without the response variables.
+
+```{r}
+df_pca = df %>% select(-PTS)
+
+res.pca <- prcomp(df_pca,  scale = TRUE)
+
+# Default plot
+fviz_eig(res.pca, addlabels = TRUE)
+get_eig(res.pca)
+```
+- We then create a new dataset containing the first few principals and the response variables.  We then run a regular linear model on this dataset where the predictors are the principals.
+
+```{r}
+# Select the four PCs
+df2 = as_tibble(res.pca$x[, c(1:2)])
+df2$PTS = df$PTS
+
+model2 = lm(PTS~., data = df2)
+
+summary(model2)
+```
+
+- Compare the two models we realize that the PCR model has much fewer predictors but still have a very close $R^2$ the the original model. 
+
+
+## Assignments
+
+- Find a dataset to apply PCR on. Your datasets should be able to provide at least 10 (numeric) predictors. Implement the regular linear model and the PCR and compare the $R^2$ of two models.  How many pricipal component could be chosen so that the PCR model does not have a significant lower $R^2$. 
+
+
+
+
+```{r, echo=FALSE, eval=FALSE}
+df = read_csv('Seasons_Stats.csv')
+df = df %>% select(-c("...1",   "Year",   "Player", "Pos", 'Tm', "blanl", "blank2" ))
+df = na.omit(df)
+```
+
+
+
+
+

@@ -1,0 +1,68 @@
+---
+title: "Assignment 11: Clustering and Recommendation System"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Submission**: Submit the knitted Word document to Canvas.
+
+------------------------------------------------------------------------
+
+[Dataset](SpotifyFeatures.csv)
+
+1. Reproduce the results of the codes from the slides.
+
+2. Apply k-means clustering based on the fewer variables and label the clusters
+
+3. Give a few recommendation for songs in each clusters. 
+
+
+```{r, echo=FALSE, eval=FALSE}
+library(ggradar)
+df1 = as_tibble(df1)
+
+df2 = df1 %>% 
+  group_by(cluster) %>% 
+  summarise_all(mean)
+
+names(df2)[1] = 'group'
+
+df2$group = as.character(df2$group)
+
+df3 = df2 %>% mutate_each(funs(rescale), -group)
+
+ggradar(df3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+df = read_csv('SpotifyFeatures.csv')
+```
+

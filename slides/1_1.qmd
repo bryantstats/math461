@@ -1,0 +1,497 @@
+---
+title: "Simple Linear Model"
+format: beamer
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# 1. Motivation
+
+-   Given the data
+
+| $x$ | $y$ |
+|-----|-----|
+| 1   | 1.1 |
+| 2   | 1.8 |
+| 3   | 2.7 |
+| 4   | 4.5 |
+
+# Scatter plot
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+
+x = c(1,2,3,4)
+y = c(1.1, 1.8, 2.7, 4.5)
+
+d1 = as_tibble(data.frame(
+     x = x, 
+     y = y))
+
+# functions
+plot_line <- function(x1, y1, x2, y2)
+  
+{
+  slope = (y2-y1)/(x2-x1)
+  intercept =  y1 - slope*x1
+  f = function(xx){return(xx*slope + intercept)}
+  
+  pp = ggplot(data = d1, aes(x = x, y=y))+
+  geom_point()+
+    geom_segment(aes(x = 0.5, y = f(0.5), xend = 4.5, yend = f(4.5)))+
+    labs(title = paste("Distance:"),
+         subtitle = paste0("y = ", round(slope,2), "x+", round(intercept,2)))+
+    xlim(0,5)+
+    ylim(0,5)+
+    coord_fixed()
+
+  print(pp)
+
+}
+
+plot_line2 <- function(x1, y1, x2, y2)
+{
+slope = (y2-y1)/(x2-x1)
+intercept =  y1 - slope*x1
+
+f = function(xx){return(xx*slope + intercept)}
+
+squared_errors = sum((y-f(x))^2)
+
+pp = ggplot(data = d1, aes(x = x, y=y))+
+  geom_point()+
+  geom_segment(aes(x = 0.5, y = f(0.5), xend = 4.5, yend = f(4.5)))+
+  geom_segment(aes(x = x[1], y = y[1], xend = x[1], yend = f(x[1])), color = 'red')+
+  geom_segment(aes(x = x[2], y = y[2], xend = x[2], yend = f(x[2])), color = 'red')+
+  geom_segment(aes(x = x[3], y = y[3], xend = x[3], yend = f(x[3])), color = 'red')+
+  geom_segment(aes(x = x[4], y = y[4], xend = x[4], yend = f(x[4])), color = 'red')+
+  geom_text(x = x[1], y = .5*(y[1]+f(y[1])), label = paste(round(abs(y[1]-f(x[1])),2)))+
+  geom_text(x = x[2], y = .5*(y[2]+f(y[2])), label = paste(round(abs(y[2]-f(x[2])),2)))+
+  geom_text(x = x[3], y = .5*(y[3]+f(y[3])), label = paste(round(abs(y[3]-f(x[3])),2)))+
+  geom_text(x = x[4], y = .5*(y[4]+f(y[4])), label = paste(round(abs(y[4]-f(x[4])),2)))+
+  labs(title = paste("Distance:", round(squared_errors,2)),
+         subtitle = paste0("y = ", round(slope,2), "x+", round(intercept,2)))+
+  xlim(0,5)+
+  ylim(0,5)+
+  coord_fixed()
+
+print(pp)
+
+}
+
+plot_line3 <- function()
+  
+{
+  l = lm(y~x) 
+slope = l$coefficients[2]
+intercept =  l$coefficients[1]
+f = function(xx){return(xx*slope + intercept)}
+squared_errors = sum((y-f(x))^2)
+pp = ggplot(data = d1, aes(x = x, y=y))+
+  geom_point()+
+  geom_segment(aes(x = 0.5, y = f(0.5), xend = 4.5, yend = f(4.5)))+
+  geom_segment(aes(x = x[1], y = y[1], xend = x[1], yend = f(x[1])), color = 'red')+
+  geom_segment(aes(x = x[2], y = y[2], xend = x[2], yend = f(x[2])), color = 'red')+
+  geom_segment(aes(x = x[3], y = y[3], xend = x[3], yend = f(x[3])), color = 'red')+
+  geom_segment(aes(x = x[4], y = y[4], xend = x[4], yend = f(x[4])), color = 'red')+
+  geom_text(x = x[1], y = .5*(y[1]+f(y[1])), label = paste(round(abs(y[1]-f(x[1])),2)))+
+  geom_text(x = x[2], y = .5*(y[2]+f(y[2])), label = paste(round(abs(y[2]-f(x[2])),2)))+
+  geom_text(x = x[3], y = .5*(y[3]+f(y[3])), label = paste(round(abs(y[3]-f(x[3])),2)))+
+  geom_text(x = x[4], y = .5*(y[4]+f(y[4])), label = paste(round(abs(y[4]-f(x[4])),2)))+
+  labs(title = paste("Distance:", round(squared_errors,2)),
+         subtitle = paste0("y = ", round(slope,2), "x+", round(intercept,2)))+
+  xlim(0,5)+
+  ylim(0,5)+
+  coord_fixed()
+
+print(pp)
+
+}
+
+```
+
+```{r}
+# ploting the point
+
+plot_line0 = function()
+{
+  ggplot(data = d1, aes(x = x, y=y))+
+  geom_point()+
+    xlim(0,5)+
+    ylim(0,5)+
+    coord_fixed()}
+
+plot_line0()
+
+```
+
+# Which line is closer to the points?
+
+```{r}
+x1 = 0
+y1 = 1
+x2 = 5
+y2 = 3
+
+a1 = 0.5
+b1 = 0
+a2 = 5
+b2 = 4
+
+ggplot(data = d1, aes(x = x, y=y))+
+  geom_point()+
+  geom_segment(aes(x = a1, y = b1, xend = a2, yend = b2))+
+  geom_segment(aes(x = x1, y = y1, xend = x2, yend = y2, color = 'red'))+
+  xlim(0,5)+
+  ylim(0,5)+
+  coord_fixed()+
+  theme(legend.position="none")
+
+```
+
+# Squared Distance between a line and points
+
+```{r}
+plot_line(x1, y1, x2, y2)
+```
+
+# Squared Distance between a line and points
+
+```{r}
+plot_line2(x1, y1, x2, y2)
+```
+
+# Squared Distance between a line and points
+
+```{r}
+plot_line(a1, b1, a2, b2)
+```
+
+# Squared Distance between a line and points
+
+```{r}
+plot_line2(a1, b1, a2, b2)
+```
+
+# Linear Model
+
+$$
+y_i = \beta_0 + \beta_1x_i +\epsilon_i
+$$
+
+-   Model Assumptions
+
+    -   (A1) The response variable $y_i$ is a random variable and the predictor $x_i$ is non-random
+
+    -   (A2) $\epsilon_i \sim^{iid} N(0, \sigma^2)$
+
+# 
+
+```{=tex}
+\begin{center}
+\Huge Parameters Estimation
+\end{center}
+```
+# The best fitted line
+
+-   The least squared methods give us the formula for the closest line or the best fitted line:
+
+$$
+y = \hat{\beta_1}x+\hat{\beta_0}
+$$
+
+-   The estimated parameters $\hat{\beta}_0$ and $\hat{\beta}_1$ are \begin{align*}
+      \hat{\beta_{1}} &= \frac{\sum_{i=1}^{n}{(x_i-\bar{x})(y_i-\bar{y})}}{\sum_{i=1}^{n}(x_i-\bar{x})^2} \\
+      &= \frac{\sum_{i=1}^{n}x_iy_i - n\bar{x}\bar{y}}{\sum_{i=1}^{n}x_i^2-n\bar{x}^2} = \frac{S_{xy}}{S_{xx}}\\
+      \hat{\beta_{0}} &= \bar{y} - \hat{\beta_{1}}\bar{x}
+    \end{align*}
+
+# Example: Calculate from Data
+
+| $x$ | $y$ |
+|-----|-----|
+| 1   | 1.1 |
+| 2   | 1.8 |
+| 3   | 2.7 |
+| 4   | 4.5 |
+
+# 
+
+|        | $x$ | $y$ | $xy$ | $x^2$ |
+|:------:|:---:|:---:|:----:|:-----:|
+|        |  1  | 1.1 |      |       |
+|        |  2  | 1.8 |      |       |
+|        |  3  | 2.7 |      |       |
+|        |  4  | 4.5 |      |       |
+| $\sum$ |     |     |      |       |
+
+# 
+
+|        | $x$ | $y$ | $xy$ | $x^2$ |
+|:------:|:---:|:---:|:----:|:-----:|
+|        |  1  | 1.1 |      |       |
+|        |  2  | 1.8 |      |       |
+|        |  3  | 2.7 |      |       |
+|        |  4  | 4.5 |      |       |
+| $\sum$ |     |     |      |       |
+
+-   $\bar{x} = \frac{1+2+3+4}{4} = 2.5$
+-   $\bar{y} = \frac{1.1+1.8+2.4+4.5}{4} = 2.525$
+
+# 
+
+|        | $x$ | $y$ | $xy$ | $x^2$ |
+|:------:|:---:|:---:|:----:|:-----:|
+|        |  1  | 1.1 | 1.1  |   1   |
+|        |  2  | 1.8 | 3.6  |   4   |
+|        |  3  | 2.7 | 8.1  |   9   |
+|        |  4  | 4.5 |  18  |  16   |
+| $\sum$ |     |     | 30.8 |  30   |
+
+-   $\hat{\beta_1} = \frac{\sum xy -n\bar{x}\bar{y}}{\sum x^2 - n\bar{x}^2} = 1.11$
+
+-   $\hat{\beta_0} = \bar{y} - \hat{\beta_{1}}\bar{x} = -0.25$
+
+# Best fitted line
+
+```{r}
+plot_line3()
+```
+
+# Some other lines
+
+```{r}
+plot_line2(0, 0, 5, 5)
+```
+
+# Some other lines
+
+```{r}
+plot_line2(0, 1, 5, 4)
+```
+
+# Some other lines
+
+```{r}
+plot_line2(0, 2, 5, 3)
+```
+
+# Some other lines
+
+```{r}
+plot_line2(0, 3, 5, 2)
+```
+
+# Example: Calculate from Sumations
+
+The regression model is $y=\beta_0 + \beta_1x+\epsilon$. There are six observations. The summary statistics are \begin{align*} 
+\sum{y_i} &= 42, \\
+\sum{x_i}&=21, \\
+\sum x_i^2 &= 91, \\
+\sum x_iy_i &= 187, \\
+\sum y_i^2 &= 390
+\end{align*}
+
+Calculate the least squares estimate of $\beta_1$.
+
+```{r, echo=FALSE, eval=FALSE}
+x = c(1,2,3,4,5,6)
+y = c(2,3,6,8, 9, 14)
+n= length(x)
+beta_1 = (sum(x*y)-n*mean(x)*mean(y))/(sum(x^2)-n*(mean(x))^2)
+
+l = lm(y~x)
+beta = l$coefficients[2]
+```
+
+# 
+
+# Example: Calculate from Sumations
+
+The regression model is $y=\beta_0 + \beta_1x+\epsilon$. There are five observations. The summary statistics are \begin{align*} 
+\sum{y_i} &= 30, \\
+\sum{x_i}&=15, \\
+\sum (x_i - \bar{x})(y_i-\bar{y}) &= 25, \\
+\sum (x_i - \bar{x})^2 &= 10, \\
+\sum (y_i - \bar{y})^2 &= 64, 
+\end{align*}
+
+Write the equation of the best fitted line using the least squares method.
+
+```{r, echo=FALSE, eval=FALSE}
+x = c(1,2,3,4,5)
+y = c(1,3,7,8, 11)
+n= length(x)
+beta_1 = (sum(x*y)-n*mean(x)*mean(y))/(sum(x^2)-n*(mean(x))^2)
+
+l = lm(y~x)
+beta = l$coefficients[2]
+```
+
+# 
+
+```{=html}
+<!--
+
+# 
+
+| $x$   | $y$   |
+|-------|-------|
+| $x_1$ | $y_1$ |
+| $x_2$ | $y_2$ |
+| ...   | ...   |
+| $x_n$ | $y_n$ |
+
+# 3. Model Assumptions
+
+-   To find the best fitted line, we do not need any assumption on the variables
+
+-   We need some assumptions to do statistical inferences
+
+# 3. Model Assumptions
+
+-   (A1) The response variable $y_i$ is a random variable and the predictor $x_i$ is non-random
+
+-   (A2) $y_1, y_2,..., y_n \sim^{iid} N(\beta_0+\beta_1x_i, \sigma^2)$
+
+-->
+```
+# 
+
+```{=tex}
+\begin{center}
+\Huge Goodness of Fit
+\end{center}
+```
+# Coefficient of Determination
+
+-   Baseline model: $$
+    y = \beta_0 + \epsilon
+    $$
+
+    -   In this model, $y_i$ is estimated by one number, $\bar{y}$
+
+-   Linear Model: $$
+    y =\beta_0+\beta_1x + \epsilon
+    $$
+
+    -   In this model, $y_i$ is estimated by
+
+$$
+\hat{y_i} =\hat{\beta}_0+\hat{\beta}_1x_i
+$$
+
+# 
+
+![](1.png)
+
+# 
+
+![](2.png)
+
+# Coefficient of Determination
+
+$$
+R^2 = 1 - \frac{RSS}{TSS}
+$$
+
+-   $R^2$ runs from 0 to 1. The larger $R^2$, the better the model
+
+# Example
+
+You are given the following results from a regression model.
+
+| Observation number (i) | $y_i$ | $\hat{f}(x_i)$ |
+|:-----------------------|:------|:---------------|
+| 1                      | 1     | 1              |
+| 2                      | 2     | 3              |
+| 3                      | 3     | 7              |
+| 4                      | 5     | 9              |
+| 5                      | 9     | 10             |
+
+Calculate the sum of squared errors (SSE) , the total sum squares (TSS), and the regression sum squares, and the $R^2$ of the model.
+
+# 
+
+# 
+
+For a simple linear regression model the total sum of squares (TSS) is 150 and the $R^2$ statistic is 0.7. Calculate the sum of squares of the residuals for this model.
+
+# F-test
+
+-   i.i.d model (Baseline Model)
+
+$$
+y =\beta_0 + \epsilon
+$$
+
+-   SLR model
+
+$$
+y =\beta_0+\beta_1x + \epsilon
+$$
+
+![](3.png)
+
+# 
+
+![](4.png)
+
+-   The smaller p-value (the larger F-statistics) supports $H_1$
+
+-   Small p-value ($\leq .05$): We reject $H_0$. The linear model is a significant improvement over the baseline model.
+
+-   Large p-value ($> .05$): Fail to reject $H_0$
+
+# Example
+
+Two actuaries are analyzing car accident claims for a group of $n = 52$ participants. The predictor $x$ is driving experience (years).
+
+Actuary 1 uses the following regression model:
+
+$$Y = \beta + \epsilon$$
+
+Actuary 2 uses the following regression model:
+
+$$Y = \beta_0 + \beta_1 \times x + \epsilon$$
+
+The residual sum of squares for the regression of Actuary 2 is 120 and the total sum of squares is 150.
+
+Calculate the F-statistic to test whether the model of Actuary 2 is a significant improvement over the model of Actuary 1.
+
+# 
+
+# t-test
+
+-   We use t-test to test the value of $\beta_1$ and $\beta_0$
+
+![](8.png)
+
+# 
+
+# Example
+
+```{r, echo=FALSE, eval=FALSE}
+x = c(1,2,3,4,5)
+y = c(1,3,7,8, 11)
+n= length(x)
+beta_1 = (sum(x*y)-n*mean(x)*mean(y))/(sum(x^2)-n*(mean(x))^2)
+
+l = lm(y~x)
+beta = l$coefficients[2]
+```
+
+The results of fitting five observations by the regression model, $y=\beta_0 + \beta_1x+\epsilon$, are given below.
+
+|           | Estimate | Std. Error | t value | Pr(\>\|t\|) |
+|:----------|:---------|:-----------|:--------|:------------|
+| Intercept | -1.5     | 0.7416     | -2.023  | 0.13631     |
+| x         | 2.5      | 0.2236     | 11.180  | 0.00153     |
+
+Determine the test results of the hypothesis $H_0: \beta_1 = 0$ against $H_{\alpha}: \beta_1 \neq 0$.
+
+# 
